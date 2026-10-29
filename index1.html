@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unblocked v86 Sandbox</title>
+    <!-- Pulling pre-compiled library -->
+    <script src="https://copy.sh"></script>
+</head>
+<body style="background: #111; color: #fff; font-family: sans-serif; text-align: center;">
+
+    <h2>v86 Custom Mirror</h2>
+    <p>Select a local OS image (.iso or .img) to boot:</p>
+    
+    <!-- Upload Input -->
+    <input type="file" id="os_file" accept=".iso,.img,.bin">
+    <br><br>
+
+    <!-- The emulator screen container -->
+    <div id="screen_container" style="display: inline-block; border: 2px solid #333;">
+        <div style="white-space: pre; font: 14px monospace; line-height: 14px;"></div>
+        <canvas style="display: none"></canvas>
+    </div>
+
+    <script>
+        "use strict";
+
+        document.getElementById("os_file").onchange = function(e) {
+            var files = e.target.files;
+            if (!files.length) return;
+            
+            var targetFile = files[0];
+            var config = {
+                // Pointing to pre-compiled WebAssembly JIT engine
+                wasm_path: "https://copy.sh",
+                memory_size: 64 * 1024 * 1024,
+                vga_memory_size: 8 * 1024 * 1024,
+                screen_container: document.getElementById("screen_container"),
+                // Pulling pre-compiled motherboard BIOS elements
+                bios: { url: "https://copy.sh" },
+                vga_bios: { url: "https://copy.sh" },
+                autostart: true
+            };
+
+            // Detect if it is a CD image (ISO) or floppy/hard disk (IMG)
+            if (targetFile.name.endsWith(".iso")) {
+                config.cdrom = { file: targetFile };
+            } else {
+                config.hda = { file: targetFile };
+            }
+
+            // Fire up the emulator
+            window.emulator = new V86Starter(config);
+            console.log("Booting: " + targetFile.name);
+        }
+    </script>
+</body>
+</html>
